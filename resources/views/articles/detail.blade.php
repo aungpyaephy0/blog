@@ -28,7 +28,7 @@
         <form action="{{ url('/comments/add') }}" method="POST">
             @csrf
             <input type="hidden" name="article_id" value="{{ $article->id }}">
-            <textarea name="content" class="form-control mb-3" placeholder="New Comment"></textarea>
+            <textarea name="content" class="form-control mb-3 mt-4" placeholder="New Comment"></textarea>
             <input type="submit" value="Add Comment" class="btn btn-info">
         </form>
     </div>
