@@ -16,17 +16,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         Article::factory()->count(20)->create();
-        Category::factory()->count(5)->create();
         Comment::factory()->count(40)->create();
 
         \App\Models\User::factory()->create([
             'name' => 'Rio',
-            'email' => 'rio@example.com',
+            'email' => 'rio@gmail.com',
         ]);
         \App\Models\User::factory()->create([
             'name' => 'Emily',
-            'email' => 'emily@example.com',
+            'email' => 'emily@gmail.com',
         ]);
 
+        $list = ["News", "Tech", "Mobile", "Web", "Lang"];
+        foreach($list as $name) {
+            Category::create([ "name" => $name ]);
+        }
     }
 }

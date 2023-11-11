@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Category;
 
 class ArticleController extends Controller
 {
@@ -55,6 +56,44 @@ class ArticleController extends Controller
         return redirect('/articles');
 
     }
+    public function edit($id)
+    {
+        $categories = Category::all();
+        $article = Article::find($id);
+
+        return view("articles.edit", [
+            "categories" => $categories,
+            "article" => $article,
+        ]);
+    }
+
+    public function update($id)
+    {
+        $validator = validator(request()->all(), [
+            "title" => "required",
+            "body" => "required",
+            "category_id" => "required",
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator);
+        }
+
+        $article = Article::find($id);
+
+        if(Gate::allows('edit-article', $article)) {
+            $article->title = request()->title;
+            $article->body = request()->body;
+            $article->category_id = request()->category_id;
+            $article->user_id = auth()->user()->id;
+            $article->save();
+
+            return redirect("/articles/detail/$id");
+        }
+
+        return redirect("/articles/detail/$id")->with("info", "Permission Denied");
+    }
+
     public function delete($id)
     {
         $article = Article::find($id);

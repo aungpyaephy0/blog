@@ -1,38 +1,77 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
-        <div class="card mb-2">
+    <div class="container" style="max-width: 800px">
+
+        @if (session('info'))
+            <div class="alert alert-info">
+                {{ session('info') }}
+            </div>
+        @endif
+
+        <div class="card mb-3 border-primary">
             <div class="card-body">
-                <h5 class="card-title">{{ $article->title }}</h5>
-                <div class="card-subtitle mb-2 text-muted small">
+                <h2 class="h3 card-title">
+                    {{ $article->title }}
+                </h2>
+                <small class="text-muted">
+                    <b class="text-success">{{ $article->user->name }}</b>,
+                    <b>Category:</b>
+                    <span class="text-primary">
+                        {{ $article->category->name ?? 'Missing' }}
+                    </span>,
+                    <b>Comments:</b> {{ count($article->comments) }},
                     {{ $article->created_at->diffForHumans() }}
-                    Category: <b>{{ $article->category->name }}</b>
+                </small>
+                <div style="font-size: 1em">
+                    {{ $article->body }}
                 </div>
-                <p class="card-text">{{ $article->body }}</p>
-                <a class="btn btn-outline-danger" href="{{ url("/articles/delete/$article->id") }}">
-                    Delete
-                </a>
+
+                @auth
+                    <div class="mt-2">
+                        @can('delete-article', $article)
+                            <a href="{{ url("/articles/delete/$article->id") }}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        @endcan
+
+                        @can('edit-article', $article)
+                            <a href="{{ url("/articles/edit/$article->id") }}" class="btn btn-sm btn-outline-info">Edit</a>
+                        @endcan
+                    </div>
+                @endauth
             </div>
         </div>
-        <ul class="list-group">
-            <li class="list-group-item active" style="background-color: #3b6099; border-color:#3b6099">
-                <b>Comments ({{ count($article->comments) }})</b>
+
+        <ul class="list-group mt-4">
+            <li class="list-group-item active">
+                Comments
+                ({{ count($article->comments) }})
             </li>
             @foreach ($article->comments as $comment)
                 <li class="list-group-item">
-                    <b class="text-info">{{ $comment->user->name }} </b>
-                    <br>
+                    @auth
+                        @can('delete-comment', $comment)
+                            <a href="{{ url("/comments/delete/$comment->id") }}" class="btn-close float-end"></a>
+                        @endcan
+                    @endauth
+
+                    <b class="text-success">
+                        {{ $comment->user->name }}
+                    </b> -
+
                     {{ $comment->content }}
 
+                    <small class="text-muted">
+                        {{ $comment->created_at->diffForHumans() }}
+                    </small>
                 </li>
             @endforeach
         </ul>
-
-        <form action="{{ url('/comments/add') }}" method="POST">
-            @csrf
-            <input type="hidden" name="article_id" value="{{ $article->id }}">
-            <textarea name="content" class="form-control mb-3 mt-4" placeholder="New Comment"></textarea>
-            <input type="submit" value="Add Comment" class="btn btn-info">
-        </form>
+        @auth
+            <form action="{{ url('/comments/add') }}" method="post" class="mt-2">
+                @csrf
+                <input type="hidden" name="article_id" value="{{ $article->id }}">
+                <textarea name="content" class="form-control mb-2"></textarea>
+                <button class="btn btn-secondary">Add Comment</button>
+            </form>
+        @endauth
     </div>
 @endsection
