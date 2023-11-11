@@ -4,14 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comment;
+use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware("auth");
+    }
     public function create()
     {
         $comment = new Comment();
         $comment->content = request()->content;
         $comment->article_id = request()->article_id;
+        $comment->user_id = auth()->user()->id;
         $comment->save();
         return back();
     }
@@ -19,7 +25,10 @@ class CommentController extends Controller
     public function delete($id)
     {
         $comment = Comment::find($id);
-        $comment->delete();
+        if(Gate::allows('delete-comment',$comment)){
+            $comment->delete();
         return back();
+        }
+        return back()->with('info',"Unable to delete");
     }
 }

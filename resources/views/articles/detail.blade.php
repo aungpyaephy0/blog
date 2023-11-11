@@ -9,18 +9,21 @@
                     Category: <b>{{ $article->category->name }}</b>
                 </div>
                 <p class="card-text">{{ $article->body }}</p>
-                <a class="btn btn-sm btn-outline" href="{{ url("/articles/delete/$article->id") }}">
+                <a class="btn btn-outline-danger" href="{{ url("/articles/delete/$article->id") }}">
                     Delete
                 </a>
             </div>
         </div>
         <ul class="list-group">
-            <li class="list-group-item active">
+            <li class="list-group-item active" style="background-color: #3b6099; border-color:#3b6099">
                 <b>Comments ({{ count($article->comments) }})</b>
             </li>
             @foreach ($article->comments as $comment)
                 <li class="list-group-item">
+                    <b class="text-info">{{ $comment->user->name }} </b>
+                    <br>
                     {{ $comment->content }}
+
                 </li>
             @endforeach
         </ul>

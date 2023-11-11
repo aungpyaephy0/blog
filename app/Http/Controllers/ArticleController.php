@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ArticleController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware("auth")->except(['index', 'detail']);
+    }
     public function index()
     {
         $data = Article::latest()->paginate(5);
@@ -20,17 +25,15 @@ class ArticleController extends Controller
         $data = Article::find($id);
         return view('articles.detail', ['article' => $data]);
     }
-
     public function add()
     {
-
         $data = [
-            [ "id" => 1, "name" => "News" ],
-            [ "id" => 2, "name" => "Tech" ],
-            ];
-            return view('articles.add', [
+            ["id" => 1, "name" => "News"],
+            ["id" => 2, "name" => "Tech"],
+        ];
+        return view('articles.add', [
             'categories' => $data
-            ]);
+        ]);
     }
 
     public function create()
@@ -39,14 +42,15 @@ class ArticleController extends Controller
             'title' => 'required',
             'body' => 'required',
             'category_id' => 'required',
-            ]);
-            if($validator->fails()) {
+        ]);
+        if ($validator->fails()) {
             return back()->withErrors($validator);
-            }
+        }
         $article = new Article;
         $article->title = request()->title;
         $article->body = request()->body;
         $article->category_id = request()->category_id;
+        $article->user_id = auth()->user()->id;
         $article->save();
         return redirect('/articles');
 
@@ -54,8 +58,11 @@ class ArticleController extends Controller
     public function delete($id)
     {
         $article = Article::find($id);
-        $article->delete();
-        return redirect('/articles')->with('info', 'Article deleted successfully');
+        if(Gate::allows('delete-article', $article)) {
+            $article->delete();
+            return redirect('/articles')->with('info', 'Article deleted successfully');
+        }
+        return back()->with('info', 'Unauthorized User');
     }
 
 }

@@ -19,10 +19,14 @@ class DatabaseSeeder extends Seeder
         Category::factory()->count(5)->create();
         Comment::factory()->count(40)->create();
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        \App\Models\User::factory()->create([
+            'name' => 'Rio',
+            'email' => 'rio@example.com',
+        ]);
+        \App\Models\User::factory()->create([
+            'name' => 'Emily',
+            'email' => 'emily@example.com',
+        ]);
 
     }
 }
