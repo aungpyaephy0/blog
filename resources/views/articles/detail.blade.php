@@ -8,7 +8,7 @@
             </div>
         @endif
 
-        <div class="card mb-3 border-primary">
+        <div class="card mb-3 border-info">
             <div class="card-body">
                 <h2 class="h3 card-title">
                     {{ $article->title }}
@@ -53,7 +53,7 @@
                         @endcan
                     @endauth
 
-                    <b class="text-success">
+                    <b class="text-secondary">
                         {{ $comment->user->name }}
                     </b> -
 
